@@ -22,28 +22,35 @@ right2 = False
 left2 = False
 up2 = False
 down2 = False
-
+allbox = 0
 X_list=[]
 Y_list=[]
 for i in range(9):
     X_list.append(i*90)
     Y_list.append(i*90)
-print(X_list)
+# print(X_list)
+allsteps = 0
+allstep = 0
+steps_passed=0
 a = 0
 a2 = 0
 b = 0
 b2 = 0
-allstep = 0
-allbox = 0
 xb = 0
 yb = 0
+Sx = []
+Sy = []
 Bx = []
 By = []
+for i in range(3):
+    Sx.append(0)
+    Sy.append(0) 
 for i in range(8):
     Bx.append(0)
     By.append(0)
 def sword (x,y):
     gameDisplay.blit(swordIMG, (x,y))
+
 def health (x,y):
     gameDisplay.blit(healthIMG, (x,y))
 
@@ -69,31 +76,57 @@ gameDisplay.blit(itemsbar,(768,0))
 gameDisplay.blit(itemsbar,(768,491))
 gameDisplay.blit(b_g_Img,(0,0))
 step = True
-def move(x,y,a,b): 
+def move(allstep,x,y,a,b): 
     stamin(820,346) 
     oldx = x
     oldy = y
     olda = a
     oldb = b
-    if right == True and a < 7:
-        a = a+1
-        x = X_list[a]  
-    if left == True and a > 0:
-        a = a-1
-        x = X_list[a]  
-    if up == True and b > 0:
-        b = b-1
-        y = Y_list[b]  
-    if down == True and b < 7:
-        b=b+1
-        y = Y_list[b] 
-    for i in range (len(By)):
-        if x==Bx[i] and y == By[i]:
-            x = oldx
-            y = oldy
-            a = olda
-            b = oldb
-    dark(820,346) 
+    poop = False
+    right=False
+    left = False
+    up = False
+    down = False
+    while not poop:
+        for event in pygame.event.get():
+            ############################
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    left = True
+                    poop = True
+                elif event.key == pygame.K_RIGHT:
+                    right = True
+                    poop = True
+                elif event.key == pygame.K_UP:
+                    up = True
+                    poop = True
+                elif event.key == pygame.K_DOWN:
+                    down = True
+                    poop = True
+            ############################
+    else:
+        if right == True and a < 7:
+            a = a+1
+            x = X_list[a]  
+        if left == True and a > 0:
+            a = a-1
+            x = X_list[a]  
+        if up == True and b > 0:
+            b = b-1
+            y = Y_list[b]  
+        if down == True and b < 7:
+            b=b+1
+            y = Y_list[b] 
+        for i in range (len(By)):
+            if x==Bx[i] and y == By[i]:
+                x = oldx
+                y = oldy
+                a = olda
+                b = oldb
+        # if allstep == 0:
+        #     allstep = 3
+        # print(allstep)
+        dark(820,346) 
     return x,y,b,a
 def spawn(D1,D2):
     if D1 == 1:    
@@ -120,6 +153,14 @@ if gameS == True:
     y2 = Y_list[b2]
 stamin(752,491)
 while not crashed:
+    # if allstep > 1:
+    #     print(allstep)
+    #     allstep = allstep - 1
+    # # if allstep < 2:
+  
+        # Sx[allstep] = X_list[random.randint(2,5)]
+        # Sy[allstep] = Y_list[random.randint(0,7)]
+        # allstep = allstep - 1
     health(740,0)
     health(740,70)
     health(740,140)
@@ -146,32 +187,43 @@ while not crashed:
                 dark(752,491)
                 stamin(752,0)
                 stamin(752,110)
-                if allstep >= 1:
-                    dark(752,601)  
-                x,y,b,a = move(x,y,a,b)
-                print(x,y)      
+                if allsteps >= 1:
+                    dark(752,601)
+                a_temp=a
+                while a_temp==a:  
+                    x,y,b,a = move(allstep,x,y,a,b)
+                if steps_passed%2==0:
+                    print(allstep) 
+                    for i in range(len(Sx)):
+                        Sx[i]= X_list[random.randint(2,5)]
+                        Sy[i]=Y_list[random.randint(0,7)]
+                # print(x,y)      
                 left = False
                 right = False
                 up = False
                 down = False
-                allstep = allstep + 1
-                if allstep >= 2:
+                allsteps = allsteps + 1
+                if allsteps >= 2:
                     step = False
             else:
                 dark(752,0) 
                 stamin(752,491) 
                 stamin(752,601)
-                if allstep <= 1:
+                if allsteps <= 1:
                     dark(752,110)
-                x2,y2,b2,a2 = move(x2,y2,a2,b2)
+                x2,y2,b2,a2 = move(allstep,x2,y2,a2,b2)
                 left = False
                 right = False
                 up = False
                 down = False 
-                allstep = allstep - 1
-                if allstep <= 0:
-                    step = True        
+                allsteps = allsteps - 1
+                if allsteps <= 0:
+                    step = True
+                    steps_passed+=1       
     gameDisplay.blit(b_g_Img,(0,0))
+    for i in range (2):
+        sword(Sx[i],Sy[i])
+    # allstep = 0
     for i in range (8):
         box(Bx[i],By[i])
     hero(x,y)
